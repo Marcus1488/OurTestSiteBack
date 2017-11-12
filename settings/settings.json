@@ -1,0 +1,13 @@
+{
+  "view": {
+    "path": "./server/views",
+    "engine": "jade"
+  },
+  "session": {
+    "secret": "293828736g27f63g",
+    "key_name": "sessionId",
+    "resave": false,
+    "save_uninitialized": true,
+    "secure_cookie": true
+  }
+}
