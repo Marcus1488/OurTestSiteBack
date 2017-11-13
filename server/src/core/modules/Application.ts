@@ -33,9 +33,16 @@ export default class Application extends CoreApplication {
         this.injectMiddlware(this.requestLogger);
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.urlencoded({ extended: false }));
+        this.app.use(function(req, res, next) {
+            res.header('Access-Control-Allow-Credentials', 'true');
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+            res.header('Access-Control-Allow-Headers', 'Authorization, X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept');
+            next();
+        });
         this.app.use(cookieParser());
         this.app.use(helmet());
-        this.app.set("trust proxy", 1); // trust first proxy
+        /*this.app.set("trust proxy", 1); // trust first proxy
         this.app.use(session({
             secret: this.parameters.session.secret,
             name: this.parameters.session.key_name,
@@ -44,7 +51,7 @@ export default class Application extends CoreApplication {
             cookie: {
                 secure: this.parameters.session.secure_cookie
             }
-        }));
+        }));*/
         this.app.use(compression());
         this.app.use(express.static(path.join(__dirname, "public")));
 

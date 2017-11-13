@@ -1,42 +1,63 @@
 import {Request, Response} from "express";
+import * as bcrypt from "bcryptjs";
+import * as jwt from "jsonwebtoken";
 import CoreController from "../core/modules/base/CoreController";
 import {Controller, Route} from "../core/modules/base/CoreExpressDecorators";
 import Methods from "../core/modules/base/CoreHttpMethods";
 import * as db from "../models";
-const {GET, POST, PATCH, DELETE} = Methods;
+import config from "../config/config";
+
+const {GET, POST, PUT} = Methods;
 
 @Controller('/user')
 export default class UserController extends CoreController {
+    @Route(POST, '/authenticate')
+    public async authenticateUser(req: Request, res: Response, next: Function) {
+        try {
+            let user = await db.models.User.findOne({where: {username: req.body.username}});
+            if (!user) return res.status(404).send('No user found.');
+            let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+            if (!passwordIsValid) return res.status(401).send({auth: false, token: null});
+            let token = jwt.sign({id: user.id}, config.secret, {
+                expiresIn: 86400
+            });
+            res.status(200).send({
+                user: {
+                    id: user.id,
+                    username: user.username
+                },
+                token: token
+            });
 
-    @Route(GET, '/')
-    public async listAction(req: Request, res: Response) {
-        let users = await db.models.User.findAll();
-        res.json({users});
+        } catch (err) {
+            return next(err)
+        }
     }
 
-    @Route(GET, '/:id')
-    public async oneAction(req: Request, res: Response) {
-        let userId = req.params.id;
-        console.log(userId);
-        res.send('');
-    }
+    @Route(POST, '/register')
+    public async registerUser(req: Request, res: Response, next: Function) {
+        try {
+            let hashedPassword = bcrypt.hashSync(req.body.password, 8);
 
-    @Route(POST, '/')
-    public async createAction(req: Request, res: Response) {
-        res.send('');
-    }
+            let user = await db.models.User.create({
+                username: req.body.username,
+                password: hashedPassword
+            });
 
-    @Route(PATCH, '/:id')
-    public async patchAction(req: Request, res: Response) {
-        let userId = req.params.id;
-        console.log(userId);
-        res.send('');
-    }
+            let token = jwt.sign({id: user.id}, config.secret, {
+                expiresIn: 86400
+            });
 
-    @Route(DELETE, '/:id')
-    public async deleteAction(req: Request, res: Response) {
-        let userId = req.params.id;
-        console.log(userId);
-        res.send('');
+            res.status(200).send({
+                user: {
+                    id: user.id,
+                    username: user.username
+                },
+                token: token
+            });
+        } catch (err) {
+            return next(err)
+        }
+
     }
 }

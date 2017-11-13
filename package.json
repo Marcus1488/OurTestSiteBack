@@ -3,9 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./server/src/boot.ts"
+    "start": "node ./server/src/boot.ts",
+    "migrate": "node_modules/.bin/sequelize db:migrate",
+    "migrate-undo": "node_modules/.bin/sequelize db:migrate:undo:all"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "bluebird": "^3.4.6",
     "body-parser": "~1.15.2",
     "compression": "^1.6.2",
@@ -16,14 +19,17 @@
     "helmet": "^3.1.0",
     "jade": "~1.11.0",
     "js-yaml": "^3.7.0",
+    "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.2",
     "morgan": "~1.7.0",
     "pg": "^6.1.2",
     "sequelize": "^3.30.2",
+    "sequelize-cli": "^3.0.0",
     "serve-favicon": "~2.3.0",
     "source-map-support": "^0.4.11"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.1",
     "@types/bluebird": "^3.0.36",
     "@types/body-parser": "0.0.33",
     "@types/compression": "0.0.33",
@@ -33,6 +39,7 @@
     "@types/helmet": "0.0.33",
     "@types/jade": "0.0.29",
     "@types/js-yaml": "^3.5.28",
+    "@types/jsonwebtoken": "^7.2.3",
     "@types/lodash": "^4.14.43",
     "@types/morgan": "^1.7.32",
     "@types/node": "0.0.0",
