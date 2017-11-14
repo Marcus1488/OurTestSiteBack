@@ -2,9 +2,11 @@ import {Request, Response} from "express";
 import CoreController from "../core/modules/base/CoreController";
 import {Controller, Route, Middleware, Use} from "../core/modules/base/CoreExpressDecorators";
 import Methods from "../core/modules/base/CoreHttpMethods";
+import config from "../config/config";
+import * as jwt from "jsonwebtoken";
 const {GET, POST} = Methods;
 
-@Controller('/')
+@Controller('/api/')
 export default class IndexController extends CoreController {
 
     @Use
@@ -13,7 +15,7 @@ export default class IndexController extends CoreController {
     }
 
     @Route(GET,'/')
-    @Middleware('logMiddleware')
+    @Middleware('verifyToken')
     public async indexAction(req: Request, res: Response) {
         return res.send({
             controller: 'index',
@@ -29,8 +31,15 @@ export default class IndexController extends CoreController {
         });
     }
 
-    private async logMiddleware(req: Request, res: Response, next: Function) {
-        console.warn(new Date());
-        return next();
+    private async verifyToken(req: Request, res: Response, next: Function) {
+        let token = req.headers.authorization;
+
+        if (!token)
+            return res.status(403).send({ auth: false, message: 'No token provided.' });
+        jwt.verify(token, config.secret, function(err) {
+            if (err)
+                return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
+            return next();
+        });
     }
 }

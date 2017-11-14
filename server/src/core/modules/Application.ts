@@ -42,8 +42,8 @@ export default class Application extends CoreApplication {
         });
         this.app.use(cookieParser());
         this.app.use(helmet());
-        /*this.app.set("trust proxy", 1); // trust first proxy
-        this.app.use(session({
+        this.app.set("trust proxy", 1); // trust first proxy
+        /*this.app.use(session({
             secret: this.parameters.session.secret,
             name: this.parameters.session.key_name,
             resave: this.parameters.session.resave,

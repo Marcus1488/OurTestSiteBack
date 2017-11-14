@@ -9,8 +9,9 @@ import config from "../config/config";
 
 const {GET, POST, PUT} = Methods;
 
-@Controller('/user')
+@Controller('/api/user')
 export default class UserController extends CoreController {
+
     @Route(POST, '/authenticate')
     public async authenticateUser(req: Request, res: Response, next: Function) {
         try {
@@ -37,6 +38,8 @@ export default class UserController extends CoreController {
     @Route(POST, '/register')
     public async registerUser(req: Request, res: Response, next: Function) {
         try {
+            if (!req.body.username || !req.body.password) return res.status(404).send('Error.');
+
             let hashedPassword = bcrypt.hashSync(req.body.password, 8);
 
             let user = await db.models.User.create({
